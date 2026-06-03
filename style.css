@@ -106,3 +106,13 @@ nav a:hover {
     color: #042d73;
     text-decoration: underline;
 }
+
+.pdf-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.pdf-container iframe {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
