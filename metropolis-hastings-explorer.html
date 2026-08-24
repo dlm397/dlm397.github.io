@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An interactive, browser-based visualization of the Metropolis-Hastings algorithm sampling a bimodal target distribution.">
+  <title>Metropolis-Hastings Algorithm</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="mh-page">
+  <header class="site-header">
+    <div class="name-block">
+      <h1>Metropolis&ndash;Hastings Algorithm</h1>
+    </div>
+
+    <nav aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="cliff.html">CLIFF</a>
+      <a href="courses.html">Coursework</a>
+      <a href="cv.html">CV</a>
+    </nav>
+  </header>
+
+  <main class="mh-explorer">
+    <section class="mh-intro-row" aria-labelledby="explorer-introduction">
+      <div>
+        <p class="section-note">
+          An implementation of the <a href="https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm" target="_blank">Metropolis-Hastings algorithm</a> as a homework assignment. Shape a two-mode target distribution, then watch a random-walk sampler decide which proposals become part of its chain.
+        </p>
+      </div>
+      <div class="status-pill" id="runStatus" data-running="true" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="runStatusText">Running</span>
+      </div>
+    </section>
+
+    <section class="lab-grid" aria-label="Metropolis-Hastings interactive laboratory">
+      <aside class="control-panel">
+        <div class="control-header">
+          <h2>Experiment controls</h2>
+        </div>
+
+        <fieldset>
+          <legend>Unknown target</legend>
+
+          <div class="range-control">
+            <label class="range-label" for="separation">
+              <span>Mode separation</span>
+              <output id="separationOutput" for="separation">3.0</output>
+            </label>
+            <input id="separation" data-setting="separation" data-reset="true" type="range" min="0" max="6" step="0.1" value="3">
+          </div>
+
+          <div class="range-control">
+            <label class="range-label" for="spread">
+              <span>Mode spread</span>
+              <output id="spreadOutput" for="spread">0.90</output>
+            </label>
+            <input id="spread" data-setting="spread" data-reset="true" type="range" min="0.35" max="1.8" step="0.05" value="0.9">
+          </div>
+
+          <div class="range-control">
+            <label class="range-label" for="correlation">
+              <span>Correlation</span>
+              <output id="correlationOutput" for="correlation">0.45</output>
+            </label>
+            <input id="correlation" data-setting="correlation" data-reset="true" type="range" min="-0.85" max="0.85" step="0.05" value="0.45">
+          </div>
+
+          <div class="range-control">
+            <label class="range-label" for="balance">
+              <span>Left-mode weight</span>
+              <output id="balanceOutput" for="balance">50%</output>
+            </label>
+            <input id="balance" data-setting="balance" data-reset="true" type="range" min="0.05" max="0.95" step="0.05" value="0.5">
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Sampler</legend>
+
+          <div class="range-control">
+            <label class="range-label" for="proposalStd">
+              <span>Proposal step size</span>
+              <output id="proposalStdOutput" for="proposalStd">0.65</output>
+            </label>
+            <input id="proposalStd" data-setting="proposalStd" type="range" min="0.05" max="2.5" step="0.05" value="0.65">
+          </div>
+
+          <div class="range-control">
+            <label class="range-label" for="burnIn">
+              <span>Burn-in</span>
+              <output id="burnInOutput" for="burnIn">100</output>
+            </label>
+            <input id="burnIn" data-setting="burnIn" data-reset="true" type="range" min="0" max="500" step="10" value="100">
+          </div>
+
+          <div class="range-control">
+            <label class="range-label" for="speed">
+              <span>Animation speed</span>
+              <output id="speedOutput" for="speed">30/s</output>
+            </label>
+            <input id="speed" data-setting="speed" type="range" min="1" max="240" step="1" value="30">
+          </div>
+        </fieldset>
+
+        <div class="switch-row">
+          <label for="revealTarget">Reveal target landscape</label>
+          <label class="switch">
+            <input id="revealTarget" type="checkbox" checked>
+            <span class="switch-ui" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="button-grid">
+          <button class="primary-button" id="toggleRun" type="button">Pause</button>
+          <button id="stepOnce" type="button">Single step</button>
+          <button id="resetChain" type="button">Reset chain</button>
+          <button id="randomizeTarget" type="button">Random target</button>
+        </div>
+      </aside>
+
+      <section class="visual-panel">
+        <div class="stat-grid" aria-label="Sampler statistics">
+          <div class="stat">
+            <span class="stat-label">Chain step</span>
+            <strong class="stat-value" id="stepStat">0</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Acceptance</span>
+            <strong class="stat-value" id="acceptanceStat">—</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Retained samples</span>
+            <strong class="stat-value" id="retainedStat">0</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Latest decision</span>
+            <strong class="stat-value" id="decisionStat">Ready</strong>
+          </div>
+        </div>
+
+        <div class="plot-grid">
+          <article class="plot-card">
+            <div class="plot-title">
+              <div>
+                <h2>Sampler trajectory</h2>
+                <p>Proposal, decision, and recent chain history</p>
+              </div>
+              <span class="plot-tag" id="targetTag">Target visible</span>
+            </div>
+            <canvas id="trajectoryCanvas" role="img" aria-label="Animated Metropolis-Hastings chain moving across a two-dimensional target distribution"></canvas>
+          </article>
+
+          <article class="plot-card">
+            <div class="plot-title">
+              <div>
+                <h2>Empirical distribution</h2>
+                <p>Frequency of retained Markov-chain states</p>
+              </div>
+              <span class="plot-tag">After burn-in</span>
+            </div>
+            <canvas id="densityCanvas" role="img" aria-label="An empirical density heatmap built from retained Metropolis-Hastings samples"></canvas>
+          </article>
+        </div>
+
+        <div class="legend" aria-label="Plot legend">
+          <span class="legend-item"><span class="legend-mark"></span>Accepted state</span>
+          <span class="legend-item"><span class="legend-mark rejected"></span>Rejected proposal</span>
+          <span class="legend-item"><span class="legend-mark retained"></span>Retained density</span>
+        </div>
+
+        <div class="explanation">
+          <span class="equation">α = min(1, p(new) / p(current))</span>
+          <span>
+            A symmetric Gaussian proposal makes its forward and reverse terms cancel. A rejection is still a valid Markov-chain sample: the chain stays at its current position, so repeated states are included in the empirical density.
+          </span>
+        </div>
+
+        <p class="sr-only" id="liveDecision" aria-live="polite"></p>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const DOMAIN = Object.freeze({ min: -5, max: 5 });
+      const MAX_STORED_STATES = 7000;
+      const MAX_DRAWN_STATES = 1800;
+      const DENSITY_GRID_SIZE = 64;
+      const TARGET_GRID_WIDTH = 180;
+      const TARGET_GRID_HEIGHT = 150;
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const controls = {
+        separation: document.querySelector("#separation"),
+        spread: document.querySelector("#spread"),
+        correlation: document.querySelector("#correlation"),
+        balance: document.querySelector("#balance"),
+        proposalStd: document.querySelector("#proposalStd"),
+        burnIn: document.querySelector("#burnIn"),
+        speed: document.querySelector("#speed"),
+        revealTarget: document.querySelector("#revealTarget")
+      };
+
+      const outputs = {
+        separation: document.querySelector("#separationOutput"),
+        spread: document.querySelector("#spreadOutput"),
+        correlation: document.querySelector("#correlationOutput"),
+        balance: document.querySelector("#balanceOutput"),
+        proposalStd: document.querySelector("#proposalStdOutput"),
+        burnIn: document.querySelector("#burnInOutput"),
+        speed: document.querySelector("#speedOutput")
+      };
+
+      const elements = {
+        runStatus: document.querySelector("#runStatus"),
+        runStatusText: document.querySelector("#runStatusText"),
+        toggleRun: document.querySelector("#toggleRun"),
+        stepOnce: document.querySelector("#stepOnce"),
+        resetChain: document.querySelector("#resetChain"),
+        randomizeTarget: document.querySelector("#randomizeTarget"),
+        stepStat: document.querySelector("#stepStat"),
+        acceptanceStat: document.querySelector("#acceptanceStat"),
+        retainedStat: document.querySelector("#retainedStat"),
+        decisionStat: document.querySelector("#decisionStat"),
+        targetTag: document.querySelector("#targetTag"),
+        liveDecision: document.querySelector("#liveDecision"),
+        trajectoryCanvas: document.querySelector("#trajectoryCanvas"),
+        densityCanvas: document.querySelector("#densityCanvas")
+      };
+
+      const state = {
+        settings: readSettings(),
+        running: !prefersReducedMotion,
+        steps: 0,
+        accepted: 0,
+        retained: 0,
+        current: { x: -3.65, y: -3.25 },
+        states: [],
+        lastTransition: null,
+        densityCounts: new Float64Array(DENSITY_GRID_SIZE * DENSITY_GRID_SIZE),
+        densityMaximum: 0,
+        targetImage: null,
+        targetDirty: true,
+        densityDirty: true,
+        layoutDirty: true,
+        lastFrameTime: performance.now(),
+        stepAccumulator: 0,
+        lastAnnouncementStep: 0
+      };
+
+      function readSettings() {
+        return {
+          separation: Number(controls.separation.value),
+          spread: Number(controls.spread.value),
+          correlation: Number(controls.correlation.value),
+          balance: Number(controls.balance.value),
+          proposalStd: Number(controls.proposalStd.value),
+          burnIn: Number(controls.burnIn.value),
+          speed: Number(controls.speed.value)
+        };
+      }
+
+      function formatControl(name, value) {
+        if (name === "balance") return `${Math.round(value * 100)}%`;
+        if (name === "speed") return `${Math.round(value)}/s`;
+        if (name === "burnIn") return Math.round(value).toLocaleString();
+        if (name === "separation") return value.toFixed(1);
+        return value.toFixed(2);
+      }
+
+      function syncControlOutputs() {
+        Object.entries(outputs).forEach(([name, output]) => {
+          output.value = formatControl(name, Number(controls[name].value));
+        });
+      }
+
+      function randomNormal() {
+        let u = 0;
+        let v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      }
+
+      function logAddExp(a, b) {
+        const maximum = Math.max(a, b);
+        return maximum + Math.log(Math.exp(a - maximum) + Math.exp(b - maximum));
+      }
+
+      function logGaussianKernel(x, y, meanX, meanY, settings = state.settings) {
+        const dx = x - meanX;
+        const dy = y - meanY;
+        const rho = settings.correlation;
+        const variance = settings.spread * settings.spread;
+        const quadratic = (dx * dx - 2 * rho * dx * dy + dy * dy) / (variance * (1 - rho * rho));
+        return -0.5 * quadratic;
+      }
+
+      function logTargetDensity(x, y, settings = state.settings) {
+        const offset = settings.separation / 2;
+        const left = Math.log(settings.balance) + logGaussianKernel(x, y, -offset, -offset, settings);
+        const right = Math.log(1 - settings.balance) + logGaussianKernel(x, y, offset, offset, settings);
+        return logAddExp(left, right);
+      }
+
+      function targetDensity(x, y) {
+        return Math.exp(logTargetDensity(x, y));
+      }
+
+      function resetChain({ randomStart = false } = {}) {
+        const start = randomStart
+          ? {
+              x: DOMAIN.min + 0.9 + Math.random() * (DOMAIN.max - DOMAIN.min - 1.8),
+              y: DOMAIN.min + 0.9 + Math.random() * (DOMAIN.max - DOMAIN.min - 1.8)
+            }
+          : { x: -3.65, y: -3.25 };
+
+        state.steps = 0;
+        state.accepted = 0;
+        state.retained = 0;
+        state.current = start;
+        state.states = [{ ...start, accepted: true, retained: false, step: 0 }];
+        state.lastTransition = null;
+        state.densityCounts.fill(0);
+        state.densityMaximum = 0;
+        state.densityDirty = true;
+        state.stepAccumulator = 0;
+        state.lastFrameTime = performance.now();
+        updateStats();
+        drawAll();
+      }
+
+      function takeMetropolisStep() {
+        const from = { ...state.current };
+        const proposal = {
+          x: from.x + state.settings.proposalStd * randomNormal(),
+          y: from.y + state.settings.proposalStd * randomNormal()
+        };
+
+        const logRatio = logTargetDensity(proposal.x, proposal.y) - logTargetDensity(from.x, from.y);
+        const logAcceptance = Math.min(0, logRatio);
+        const accepted = Math.log(Math.max(Number.EPSILON, Math.random())) < logAcceptance;
+
+        state.steps += 1;
+        if (accepted) {
+          state.current = proposal;
+          state.accepted += 1;
+        }
+
+        const retained = state.steps > state.settings.burnIn;
+        if (retained) {
+          state.retained += 1;
+          addDensitySample(state.current.x, state.current.y);
+        }
+
+        state.states.push({
+          x: state.current.x,
+          y: state.current.y,
+          accepted,
+          retained,
+          step: state.steps
+        });
+
+        if (state.states.length > MAX_STORED_STATES) {
+          state.states.splice(0, state.states.length - MAX_STORED_STATES);
+        }
+
+        state.lastTransition = {
+          from,
+          proposal,
+          to: { ...state.current },
+          accepted,
+          probability: Math.exp(logAcceptance),
+          step: state.steps
+        };
+
+        if (state.steps - state.lastAnnouncementStep >= Math.max(1, Math.round(state.settings.speed))) {
+          elements.liveDecision.textContent = `Step ${state.steps}: proposal ${accepted ? "accepted" : "rejected"}.`;
+          state.lastAnnouncementStep = state.steps;
+        }
+      }
+
+      function addDensitySample(x, y) {
+        const range = DOMAIN.max - DOMAIN.min;
+        const column = Math.floor(((x - DOMAIN.min) / range) * DENSITY_GRID_SIZE);
+        const row = Math.floor(((DOMAIN.max - y) / range) * DENSITY_GRID_SIZE);
+
+        if (column < 0 || column >= DENSITY_GRID_SIZE || row < 0 || row >= DENSITY_GRID_SIZE) return;
+
+        const index = row * DENSITY_GRID_SIZE + column;
+        state.densityCounts[index] += 1;
+        state.densityMaximum = Math.max(state.densityMaximum, state.densityCounts[index]);
+        state.densityDirty = true;
+      }
+
+      function setRunning(nextRunning) {
+        state.running = nextRunning;
+        elements.runStatus.dataset.running = String(nextRunning);
+        elements.runStatusText.textContent = nextRunning ? "Running" : "Paused";
+        elements.toggleRun.textContent = nextRunning ? "Pause" : "Start";
+        elements.toggleRun.setAttribute("aria-label", nextRunning ? "Pause sampler" : "Start sampler");
+        state.lastFrameTime = performance.now();
+      }
+
+      function updateStats() {
+        const acceptanceRate = state.steps === 0 ? null : state.accepted / state.steps;
+        elements.stepStat.textContent = state.steps.toLocaleString();
+        elements.acceptanceStat.textContent = acceptanceRate === null ? "—" : `${Math.round(acceptanceRate * 100)}%`;
+        elements.retainedStat.textContent = state.retained.toLocaleString();
+
+        if (!state.lastTransition) {
+          elements.decisionStat.textContent = state.settings.burnIn > 0 ? "Burn-in" : "Ready";
+          elements.decisionStat.style.color = "";
+          return;
+        }
+
+        elements.decisionStat.textContent = state.lastTransition.accepted ? "Accepted" : "Rejected";
+        elements.decisionStat.style.color = state.lastTransition.accepted ? "#2e6f5f" : "#a83f36";
+      }
+
+      function canvasMetrics(canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const width = Math.max(280, rect.width);
+        const height = Math.max(250, rect.height);
+        const pixelWidth = Math.round(width * dpr);
+        const pixelHeight = Math.round(height * dpr);
+
+        if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+          canvas.width = pixelWidth;
+          canvas.height = pixelHeight;
+          state.targetDirty = true;
+          state.layoutDirty = true;
+        }
+
+        const context = canvas.getContext("2d");
+        context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { context, width, height, dpr };
+      }
+
+      function plotArea(width, height) {
+        const margins = { left: 43, top: 17, right: 16, bottom: 36 };
+        const availableWidth = width - margins.left - margins.right;
+        const availableHeight = height - margins.top - margins.bottom;
+        const size = Math.min(availableWidth, availableHeight);
+        const left = margins.left + (availableWidth - size) / 2;
+        const top = margins.top + (availableHeight - size) / 2;
+
+        return {
+          left,
+          top,
+          right: left + size,
+          bottom: top + size,
+          get width() { return this.right - this.left; },
+          get height() { return this.bottom - this.top; }
+        };
+      }
+
+      function toPixel(point, area) {
+        const range = DOMAIN.max - DOMAIN.min;
+        return {
+          x: area.left + ((point.x - DOMAIN.min) / range) * area.width,
+          y: area.top + ((DOMAIN.max - point.y) / range) * area.height
+        };
+      }
+
+      function buildTargetImage() {
+        const offscreen = document.createElement("canvas");
+        offscreen.width = TARGET_GRID_WIDTH;
+        offscreen.height = TARGET_GRID_HEIGHT;
+        const context = offscreen.getContext("2d");
+        const image = context.createImageData(offscreen.width, offscreen.height);
+        const densities = new Float64Array(offscreen.width * offscreen.height);
+        let maximum = 0;
+
+        for (let row = 0; row < offscreen.height; row += 1) {
+          const y = DOMAIN.max - (row / (offscreen.height - 1)) * (DOMAIN.max - DOMAIN.min);
+          for (let column = 0; column < offscreen.width; column += 1) {
+            const x = DOMAIN.min + (column / (offscreen.width - 1)) * (DOMAIN.max - DOMAIN.min);
+            const value = targetDensity(x, y);
+            const index = row * offscreen.width + column;
+            densities[index] = value;
+            maximum = Math.max(maximum, value);
+          }
+        }
+
+        for (let index = 0; index < densities.length; index += 1) {
+          const normalized = Math.pow(densities[index] / Math.max(maximum, Number.EPSILON), 0.45);
+          const color = targetColor(normalized);
+          const offset = index * 4;
+          image.data[offset] = color[0];
+          image.data[offset + 1] = color[1];
+          image.data[offset + 2] = color[2];
+          image.data[offset + 3] = 255;
+        }
+
+        context.putImageData(image, 0, 0);
+        state.targetImage = offscreen;
+        state.targetDirty = false;
+      }
+
+      function targetColor(value) {
+        const stops = [
+          [0.00, [247, 249, 250]],
+          [0.16, [232, 239, 244]],
+          [0.42, [181, 205, 221]],
+          [0.70, [75, 136, 174]],
+          [1.00, [10, 61, 98]]
+        ];
+        return interpolateStops(value, stops);
+      }
+
+      function densityColor(value) {
+        const stops = [
+          [0.00, [247, 249, 250]],
+          [0.12, [244, 237, 225]],
+          [0.36, [231, 196, 142]],
+          [0.67, [197, 109, 76]],
+          [1.00, [126, 48, 38]]
+        ];
+        return interpolateStops(value, stops);
+      }
+
+      function interpolateStops(value, stops) {
+        const clamped = Math.max(0, Math.min(1, value));
+        for (let index = 1; index < stops.length; index += 1) {
+          if (clamped <= stops[index][0]) {
+            const [startPosition, startColor] = stops[index - 1];
+            const [endPosition, endColor] = stops[index];
+            const amount = (clamped - startPosition) / (endPosition - startPosition);
+            return startColor.map((channel, channelIndex) => Math.round(channel + (endColor[channelIndex] - channel) * amount));
+          }
+        }
+        return stops[stops.length - 1][1];
+      }
+
+      function drawAxes(context, area) {
+        context.save();
+        context.strokeStyle = "rgba(10, 61, 98, 0.10)";
+        context.fillStyle = "rgba(77, 88, 99, 0.78)";
+        context.lineWidth = 1;
+        context.font = "10px ui-sans-serif, system-ui, sans-serif";
+        context.textAlign = "center";
+        context.textBaseline = "top";
+
+        for (let value = -4; value <= 4; value += 2) {
+          const vertical = toPixel({ x: value, y: 0 }, area).x;
+          const horizontal = toPixel({ x: 0, y: value }, area).y;
+
+          context.beginPath();
+          context.moveTo(vertical, area.top);
+          context.lineTo(vertical, area.bottom);
+          context.stroke();
+
+          context.beginPath();
+          context.moveTo(area.left, horizontal);
+          context.lineTo(area.right, horizontal);
+          context.stroke();
+
+          context.fillText(String(value), vertical, area.bottom + 9);
+          context.textAlign = "right";
+          context.textBaseline = "middle";
+          context.fillText(String(value), area.left - 9, horizontal);
+          context.textAlign = "center";
+          context.textBaseline = "top";
+        }
+
+        context.strokeStyle = "rgba(10, 61, 98, 0.22)";
+        context.strokeRect(area.left + 0.5, area.top + 0.5, area.width - 1, area.height - 1);
+        context.restore();
+      }
+
+      function drawTrajectory() {
+        const { context, width, height } = canvasMetrics(elements.trajectoryCanvas);
+        const area = plotArea(width, height);
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = "#f7f9fa";
+        context.fillRect(0, 0, width, height);
+
+        if (controls.revealTarget.checked) {
+          if (state.targetDirty || !state.targetImage) buildTargetImage();
+          context.save();
+          context.globalAlpha = 0.9;
+          context.imageSmoothingEnabled = true;
+          context.drawImage(state.targetImage, area.left, area.top, area.width, area.height);
+          context.restore();
+        } else {
+          drawHiddenTargetMessage(context, area);
+        }
+
+        drawAxes(context, area);
+        drawSampleCloud(context, area);
+        drawRecentTrace(context, area);
+        drawLastTransition(context, area);
+        drawCurrentState(context, area);
+
+        if (state.steps < state.settings.burnIn) {
+          drawCanvasBadge(context, area, `Burn-in ${state.steps} / ${state.settings.burnIn}`);
+        }
+      }
+
+      function drawHiddenTargetMessage(context, area) {
+        const gradient = context.createRadialGradient(
+          area.left + area.width * 0.5,
+          area.top + area.height * 0.5,
+          0,
+          area.left + area.width * 0.5,
+          area.top + area.height * 0.5,
+          area.width * 0.65
+        );
+        gradient.addColorStop(0, "#edf2f5");
+        gradient.addColorStop(1, "#f8fafb");
+        context.fillStyle = gradient;
+        context.fillRect(area.left, area.top, area.width, area.height);
+
+        context.save();
+        context.fillStyle = "rgba(77, 88, 99, 0.76)";
+        context.font = "600 12px ui-sans-serif, system-ui, sans-serif";
+        context.textAlign = "center";
+        context.fillText("Target hidden — decisions use density ratios only", area.left + area.width / 2, area.top + 28);
+        context.restore();
+      }
+
+      function drawSampleCloud(context, area) {
+        const start = Math.max(0, state.states.length - MAX_DRAWN_STATES);
+        context.save();
+
+        for (let index = start; index < state.states.length; index += 1) {
+          const sample = state.states[index];
+          if (!sample.retained || !sample.accepted) continue;
+          const point = toPixel(sample, area);
+          if (!isInsidePlot(point, area)) continue;
+          context.beginPath();
+          context.arc(point.x, point.y, 1.65, 0, Math.PI * 2);
+          context.fillStyle = "rgba(10, 61, 98, 0.30)";
+          context.fill();
+        }
+
+        context.restore();
+      }
+
+      function drawRecentTrace(context, area) {
+        const visibleStates = state.states.slice(-220);
+        if (visibleStates.length < 2) return;
+
+        context.save();
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.lineWidth = 1.25;
+
+        for (let index = 1; index < visibleStates.length; index += 1) {
+          const previous = toPixel(visibleStates[index - 1], area);
+          const current = toPixel(visibleStates[index], area);
+          if (!isInsidePlot(previous, area) && !isInsidePlot(current, area)) continue;
+          const progress = index / visibleStates.length;
+          context.strokeStyle = `rgba(27, 31, 35, ${0.04 + progress * 0.28})`;
+          context.beginPath();
+          context.moveTo(previous.x, previous.y);
+          context.lineTo(current.x, current.y);
+          context.stroke();
+        }
+
+        context.restore();
+      }
+
+      function drawLastTransition(context, area) {
+        if (!state.lastTransition) return;
+        const from = toPixel(state.lastTransition.from, area);
+        const proposal = toPixel(state.lastTransition.proposal, area);
+
+        context.save();
+        context.setLineDash([4, 4]);
+        context.lineWidth = 1.3;
+        context.strokeStyle = state.lastTransition.accepted ? "rgba(46, 111, 95, 0.84)" : "rgba(168, 63, 54, 0.86)";
+        context.beginPath();
+        context.moveTo(from.x, from.y);
+        context.lineTo(proposal.x, proposal.y);
+        context.stroke();
+        context.setLineDash([]);
+
+        if (isInsidePlot(proposal, area)) {
+          if (state.lastTransition.accepted) {
+            context.fillStyle = "#2e6f5f";
+            context.beginPath();
+            context.arc(proposal.x, proposal.y, 4.2, 0, Math.PI * 2);
+            context.fill();
+          } else {
+            context.strokeStyle = "#a83f36";
+            context.lineWidth = 2.2;
+            const size = 4.7;
+            context.beginPath();
+            context.moveTo(proposal.x - size, proposal.y - size);
+            context.lineTo(proposal.x + size, proposal.y + size);
+            context.moveTo(proposal.x + size, proposal.y - size);
+            context.lineTo(proposal.x - size, proposal.y + size);
+            context.stroke();
+          }
+        }
+        context.restore();
+      }
+
+      function drawCurrentState(context, area) {
+        const point = toPixel(state.current, area);
+        if (!isInsidePlot(point, area)) return;
+
+        context.save();
+        context.shadowColor = "rgba(10, 61, 98, 0.38)";
+        context.shadowBlur = 13;
+        context.fillStyle = "#ffffff";
+        context.beginPath();
+        context.arc(point.x, point.y, 4.4, 0, Math.PI * 2);
+        context.fill();
+        context.shadowBlur = 0;
+        context.strokeStyle = "#0a3d62";
+        context.lineWidth = 2;
+        context.beginPath();
+        context.arc(point.x, point.y, 7.4, 0, Math.PI * 2);
+        context.stroke();
+        context.restore();
+      }
+
+      function drawDensity() {
+        const { context, width, height } = canvasMetrics(elements.densityCanvas);
+        const area = plotArea(width, height);
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = "#f7f9fa";
+        context.fillRect(0, 0, width, height);
+        drawDensityHeatmap(context, area);
+        drawAxes(context, area);
+
+        if (state.retained === 0) {
+          const remaining = Math.max(0, state.settings.burnIn - state.steps + 1);
+          context.save();
+          context.fillStyle = "rgba(77, 88, 99, 0.78)";
+          context.font = "650 12px ui-sans-serif, system-ui, sans-serif";
+          context.textAlign = "center";
+          context.fillText(
+            remaining > 0 ? `Density begins after ${remaining} more step${remaining === 1 ? "" : "s"}` : "Waiting for a retained sample",
+            area.left + area.width / 2,
+            area.top + area.height / 2
+          );
+          context.restore();
+        } else {
+          const point = toPixel(state.current, area);
+          if (isInsidePlot(point, area)) {
+            context.save();
+            context.strokeStyle = "rgba(27, 31, 35, 0.88)";
+            context.lineWidth = 1.5;
+            context.beginPath();
+            context.arc(point.x, point.y, 5.2, 0, Math.PI * 2);
+            context.stroke();
+            context.restore();
+          }
+        }
+      }
+
+      function drawDensityHeatmap(context, area) {
+        if (state.retained === 0) {
+          context.fillStyle = "#f7f9fa";
+          context.fillRect(area.left, area.top, area.width, area.height);
+          return;
+        }
+
+        const smooth = smoothDensityCounts();
+        let smoothMaximum = 0;
+        for (const value of smooth) smoothMaximum = Math.max(smoothMaximum, value);
+
+        const offscreen = document.createElement("canvas");
+        offscreen.width = DENSITY_GRID_SIZE;
+        offscreen.height = DENSITY_GRID_SIZE;
+        const offscreenContext = offscreen.getContext("2d");
+        const image = offscreenContext.createImageData(DENSITY_GRID_SIZE, DENSITY_GRID_SIZE);
+        const denominator = Math.log1p(Math.max(smoothMaximum, Number.EPSILON) * 1.05);
+
+        for (let index = 0; index < smooth.length; index += 1) {
+          const normalized = denominator === 0 ? 0 : Math.log1p(smooth[index]) / denominator;
+          const color = densityColor(Math.pow(normalized, 0.78));
+          const offset = index * 4;
+          image.data[offset] = color[0];
+          image.data[offset + 1] = color[1];
+          image.data[offset + 2] = color[2];
+          image.data[offset + 3] = 255;
+        }
+
+        offscreenContext.putImageData(image, 0, 0);
+        context.save();
+        context.imageSmoothingEnabled = true;
+        context.drawImage(offscreen, area.left, area.top, area.width, area.height);
+        context.restore();
+        state.densityDirty = false;
+      }
+
+      function smoothDensityCounts() {
+        const size = DENSITY_GRID_SIZE;
+        const horizontal = new Float64Array(state.densityCounts.length);
+        const result = new Float64Array(state.densityCounts.length);
+        const kernel = [1, 4, 6, 4, 1];
+        const kernelSum = 16;
+
+        for (let row = 0; row < size; row += 1) {
+          for (let column = 0; column < size; column += 1) {
+            let sum = 0;
+            for (let offset = -2; offset <= 2; offset += 1) {
+              const sourceColumn = Math.max(0, Math.min(size - 1, column + offset));
+              sum += state.densityCounts[row * size + sourceColumn] * kernel[offset + 2];
+            }
+            horizontal[row * size + column] = sum / kernelSum;
+          }
+        }
+
+        for (let row = 0; row < size; row += 1) {
+          for (let column = 0; column < size; column += 1) {
+            let sum = 0;
+            for (let offset = -2; offset <= 2; offset += 1) {
+              const sourceRow = Math.max(0, Math.min(size - 1, row + offset));
+              sum += horizontal[sourceRow * size + column] * kernel[offset + 2];
+            }
+            result[row * size + column] = sum / kernelSum;
+          }
+        }
+
+        return result;
+      }
+
+      function isInsidePlot(point, area) {
+        return point.x >= area.left && point.x <= area.right && point.y >= area.top && point.y <= area.bottom;
+      }
+
+      function drawCanvasBadge(context, area, text) {
+        context.save();
+        context.font = "650 10px ui-sans-serif, system-ui, sans-serif";
+        const width = context.measureText(text).width + 18;
+        const x = area.right - width - 9;
+        const y = area.top + 9;
+        context.fillStyle = "rgba(255, 255, 255, 0.90)";
+        context.beginPath();
+        if (typeof context.roundRect === "function") {
+          context.roundRect(x, y, width, 25, 7);
+        } else {
+          context.rect(x, y, width, 25);
+        }
+        context.fill();
+        context.strokeStyle = "rgba(10, 61, 98, 0.16)";
+        context.stroke();
+        context.fillStyle = "rgba(6, 42, 66, 0.88)";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(text, x + width / 2, y + 12.5);
+        context.restore();
+      }
+
+      function drawAll() {
+        drawTrajectory();
+        drawDensity();
+        updateStats();
+        state.layoutDirty = false;
+      }
+
+      function randomizeTarget() {
+        controls.separation.value = randomSliderValue(controls.separation, 1, 5.7);
+        controls.spread.value = randomSliderValue(controls.spread, 0.5, 1.55);
+        controls.correlation.value = randomSliderValue(controls.correlation, -0.75, 0.75);
+        controls.balance.value = randomSliderValue(controls.balance, 0.2, 0.8);
+        state.settings = readSettings();
+        state.targetDirty = true;
+        syncControlOutputs();
+        resetChain({ randomStart: true });
+      }
+
+      function randomSliderValue(input, minimum, maximum) {
+        const step = Number(input.step) || 1;
+        const value = minimum + Math.random() * (maximum - minimum);
+        const snapped = Math.round(value / step) * step;
+        const decimals = (input.step.split(".")[1] || "").length;
+        return Math.max(Number(input.min), Math.min(Number(input.max), snapped)).toFixed(decimals);
+      }
+
+      function animationFrame(timestamp) {
+        const elapsedSeconds = Math.min(0.1, (timestamp - state.lastFrameTime) / 1000);
+        state.lastFrameTime = timestamp;
+        let changed = state.layoutDirty;
+
+        if (state.running) {
+          state.stepAccumulator += elapsedSeconds * state.settings.speed;
+          const stepsThisFrame = Math.min(30, Math.floor(state.stepAccumulator));
+          if (stepsThisFrame > 0) {
+            state.stepAccumulator -= stepsThisFrame;
+            for (let index = 0; index < stepsThisFrame; index += 1) takeMetropolisStep();
+            changed = true;
+          }
+        }
+
+        if (changed) drawAll();
+        requestAnimationFrame(animationFrame);
+      }
+
+      document.querySelectorAll("input[data-setting]").forEach((input) => {
+        input.addEventListener("input", () => {
+          state.settings = readSettings();
+          syncControlOutputs();
+
+          if (input.dataset.reset === "true") {
+            state.targetDirty = true;
+            resetChain();
+          }
+        });
+      });
+
+      controls.revealTarget.addEventListener("change", () => {
+        elements.targetTag.textContent = controls.revealTarget.checked ? "Target visible" : "Target hidden";
+        drawTrajectory();
+      });
+
+      elements.toggleRun.addEventListener("click", () => setRunning(!state.running));
+
+      elements.stepOnce.addEventListener("click", () => {
+        setRunning(false);
+        takeMetropolisStep();
+        drawAll();
+      });
+
+      elements.resetChain.addEventListener("click", () => resetChain({ randomStart: true }));
+      elements.randomizeTarget.addEventListener("click", randomizeTarget);
+
+      const resizeObserver = new ResizeObserver(() => {
+        state.layoutDirty = true;
+      });
+      resizeObserver.observe(elements.trajectoryCanvas);
+      resizeObserver.observe(elements.densityCanvas);
+
+      syncControlOutputs();
+      setRunning(state.running);
+      resetChain();
+      requestAnimationFrame(animationFrame);
+    })();
+  </script>
+</body>
+</html>

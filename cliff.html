@@ -2,11 +2,13 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>CLIFF Tools</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="An overview of the Atlanta Fed's Career Ladder Identifier and Financial Forecaster tools and Dominic Marchese's work on the project.">
+    <title>CLIFF Tools | Dominic Marchese</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="cliff-page">
     <header class="site-header">
         <div class="name-block">
             <h1>CLIFF Tools</h1>
@@ -21,43 +23,131 @@
     </header>
 
     <main>
-        <section class="hero">
+        <section class="hero" aria-labelledby="cliff-overview-heading">
             <div class="hero-copy">
-                <p class="lead">Career Ladder Identifier and Financial Forecaster</p>
+                <p class="eyebrow">Federal Reserve Bank of Atlanta</p>
+                <h2 id="cliff-overview-heading">Career Ladder Identifier and Financial Forecaster</h2>
                 <p>
-                    The CLIFF tools are designed to help lower-income households think more clearly about career pathways,
-                    financial decision-making, and the tradeoffs associated with different trajectories over time. The project
-                    is used by career counselors and financial coaches to help clients make more informed decisions about their future.
+                    CLIFF is a suite of interactive tools that models how public benefits, taxes, tax credits, earnings, and
+                    household expenses interact as workers advance along a career path. The tools help individuals and advisers
+                    compare near-term choices, explore long-term career outcomes, and build individualized plans.
                 </p>
+                <div class="quick-links">
+                    <a class="button" href="https://www.atlantafed.org/research-and-data/data/cliff-tool" target="_blank" rel="noopener">Explore the official CLIFF suite</a>
+                    <a class="button secondary" href="https://www.atlantafed.org/what-we-study/workforce-development/advancing-careers-for-low-income-families" target="_blank" rel="noopener">Advancing Careers research</a>
+                </div>
             </div>
 
             <aside class="info-panel">
-                <h2>Project Focus</h2>
+                <h2>What is a benefits cliff?</h2>
+                <p>
+                    A benefits cliff can occur when an increase in earnings triggers a loss of means-tested public assistance
+                    large enough to leave a household financially worse off. A benefits plateau occurs when the household is no
+                    better off after the change.
+                </p>
                 <ul>
-                    <li>Household financial forecasting</li>
-                    <li>Career pathway evaluation</li>
-                    <li>Decision support for lower-income households</li>
+                    <li>Make benefit changes visible before a transition</li>
+                    <li>Compare career and training pathways</li>
+                    <li>Support informed coaching conversations</li>
                 </ul>
             </aside>
         </section>
 
-        <section class="content-grid">
+        <section class="cliff-tools" aria-labelledby="cliff-tools-heading">
+            <h2 id="cliff-tools-heading">Three tools for different decisions</h2>
+            <p class="section-note">
+                Each tool uses individualized public-assistance information, but the depth of planning and customization differs.
+            </p>
+
+            <div class="cliff-tool-grid">
+                <article class="cliff-tool-card">
+                    <p class="cliff-tool-level">Quick comparison</p>
+                    <h3>CLIFF Snapshot</h3>
+                    <p>
+                        Compares immediate scenarios to show how changes in wages, work hours, or benefits may affect a
+                        household's financial stability.
+                    </p>
+                    <ul>
+                        <li>Customized wages and work hours</li>
+                        <li>Near-term scenario comparison</li>
+                        <li>Individualized public assistance</li>
+                    </ul>
+                    <a class="cliff-tool-link" href="https://federalbankofatlanta-cliff-snapshot.share.connect.posit.cloud" target="_blank" rel="noopener">Open CLIFF Snapshot</a>
+                </article>
+
+                <article class="cliff-tool-card">
+                    <p class="cliff-tool-level">Long-term analysis</p>
+                    <h3>CLIFF Dashboard</h3>
+                    <p>
+                        Projects income, expenses, taxes, and benefits over more than 20 years to compare career choices and
+                        estimate when a household may reach self-sufficiency.
+                    </p>
+                    <ul>
+                        <li>Compare occupational pathways</li>
+                        <li>Long-term financial projections</li>
+                        <li>Estimated household expenses</li>
+                    </ul>
+                    <a class="cliff-tool-link" href="https://federalbankofatlanta-cliff-dashboard.share.connect.posit.cloud" target="_blank" rel="noopener">Open CLIFF Dashboard</a>
+                </article>
+
+                <article class="cliff-tool-card">
+                    <p class="cliff-tool-level">Individualized planning</p>
+                    <h3>CLIFF Planner</h3>
+                    <p>
+                        Builds a detailed education, career, and budget plan using customized wages, work hours, expenses,
+                        training costs, supplemental supports, and grants.
+                    </p>
+                    <ul>
+                        <li>Customized household budget</li>
+                        <li>Education and career planning</li>
+                        <li>Detailed financial picture</li>
+                    </ul>
+                    <a class="cliff-tool-link" href="https://federalbankofatlanta-cliff-planner.share.connect.posit.cloud" target="_blank" rel="noopener">Open CLIFF Planner</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="content-grid cliff-details" aria-label="CLIFF project details">
             <article class="card">
-                <h3>Project Summary</h3>
+                <h3>What CLIFF brings together</h3>
                 <p>
-                    CLIFF is a practical set of tools meant to make complex economic tradeoffs more transparent. Rather than
-                    focusing solely on static outcomes, the project emphasizes how household decisions and earnings trajectories
-                    evolve over time and how those dynamics affect financial stability and long-term opportunity.
+                    The tools combine estimates of occupational wages, public-assistance receipt, taxes and tax credits, and
+                    basic household costs such as housing, childcare, health care, and transportation. This broader view helps
+                    make the financial consequences of career advancement easier to anticipate.
                 </p>
             </article>
 
             <article class="card">
                 <h3>My Work on the Project</h3>
                 <p>
-                    My role has been to implement user friendly tools for data visualization, storage, and augmentation.
+                    My role focuses on implementing user-friendly tools for data visualization, data storage, and data
+                    augmentation. This work supports clearer presentation and more effective use of the information that powers
+                    CLIFF's career and financial-planning experiences.
+                </p>
+            </article>
+
+            <article class="card">
+                <h3>Designed for coaching</h3>
+                <p>
+                    CLIFF is designed for use in coaching environments focused on economic mobility. Human-services agencies,
+                    workforce-development organizations, and financial coaches can use the tools to help clients understand
+                    tradeoffs and prepare for changes in public assistance.
+                </p>
+            </article>
+
+            <article class="card">
+                <h3>Evidence from implementation</h3>
+                <p>
+                    A two-year Atlanta Fed study examined CLIFF implementation at 23 organizations across 13 states. The findings
+                    emphasize identifying the appropriate users, integrating the tools into organizational workflows, and giving
+                    coaches enough time and training to discuss results effectively.
+                </p>
+                <p class="card-link-row">
+                    <a href="https://www.atlantafed.org/research-and-data/publications/discussion-papers/2024/05/28/01-benefits-cliff-coaching-with-the-atlanta-feds-cliff-tools-implementation-evaluation-of-the-national-pilot" target="_blank" rel="noopener">Read the implementation evaluation</a>
                 </p>
             </article>
         </section>
+
     </main>
 </body>
 </html>
