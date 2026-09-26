@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Dominic Marchese's research at the Nyheim Plasma Institute: Julia simulations of nonlinear electron transport and Python analysis of ELFIN satellite observations.">
+    <title>Nyheim Plasma Research | Dominic Marchese</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" type="image/png" href="../favicon.png">
+</head>
+
+<body class="research-page">
+    <header class="site-header">
+        <div class="name-block">
+            <p class="research-site-name">Dominic Marchese</p>
+        </div>
+        <nav aria-label="Primary navigation">
+            <a href="../index.html">Home</a>
+            <a href="../research.html" aria-current="true">Research</a>
+            <a href="../cliff.html">CLIFF</a>
+            <a href="../cv.html">CV</a>
+        </nav>
+    </header>
+
+    <main class="research-article">
+        <a class="research-back-link" href="../research.html"><span aria-hidden="true">&larr;</span> All research</a>
+
+        <article>
+            <header class="research-article-header">
+                <p class="eyebrow">C. &amp; J. Nyheim Plasma Institute &middot; Drexel University</p>
+                <h1>Electron super- and sub-diffusion in velocity space due to nonlinear resonances with whistler-mode waves</h1>
+                <p class="research-subtitle"></p>
+                <dl class="research-meta">
+                    <div>
+                        <dt>Role &amp; period</dt>
+                        <dd>Research Assistant<br>2025&ndash;2026</dd>
+                    </div>
+                    <div>
+                        <dt>Supervisor</dt>
+                        <dd>Dr. Dmitri Vainchtein</dd>
+                    </div>
+                    <div>
+                        <dt>Tools</dt>
+                        <dd>Julia, Python, R, &amp; SQL</dd>
+                    </div>
+                </dl>
+            </header>
+
+            <section aria-labelledby="question-heading">
+                <h2 id="question-heading">The research question</h2>
+                <p>
+                    Energetic electrons in Earth's magnetosphere exchange energy with electromagnetic waves.
+                    Repeated interactions can change both their energy and their pitch angle, the angle between
+                    a particle's velocity and the magnetic field. This project investigated how nonlinear
+                    resonances with whistler-mode waves can produce spreading that is faster or slower than
+                    ordinary diffusion.
+                </p>
+                <p>
+                    As a research assistant in the Computational Physics Laboratory, I worked on numerical
+                    models of these interactions and statistical analysis of satellite observations.
+                    The work brought together dynamical systems, stochastic simulation, and spectral fitting.
+                </p>
+            </section>
+
+            <section aria-labelledby="model-heading">
+                <h2 id="model-heading">Modeling repeated wave-particle interactions</h2>
+                <p>
+                    I developed Julia simulations that update electron energy and pitch angle over successive
+                    resonant interactions. The model represents two processes: phase bunching, which produces
+                    relatively small energy changes, and phase trapping, which can produce larger jumps.
+                    Their probabilities and energy changes depend on the geometry of the resonance.
+                </p>
+                <ul class="research-methods">
+                    <li>
+                        <strong>Numerical calculations:</strong> used root finding and quadrature to calculate
+                        the area enclosed by a resonance separatrix, the boundary between trapped and untrapped motion.
+                    </li>
+                    <li>
+                        <strong>Particle ensembles:</strong> simulated repeated interactions across initial
+                        energies and pitch angles, then examined how the distributions spread.
+                    </li>
+                    <li>
+                        <strong>Transport diagnostics:</strong> compared early-time spreading rates and mapped
+                        their dependence on initial conditions and wave frequency.
+                    </li>
+                </ul>
+                <div class="research-equation">
+                    <p class="formula"><var>M</var>(<var>n</var>) &prop; <var>n</var><sup><var>A</var></sup></p>
+                    <p>
+                        Here, <var>M</var> measures ensemble spreading and <var>n</var> counts resonant
+                        interactions. The exponent <var>A</var> distinguishes sub-diffusion
+                        (<var>A</var> &lt; 1), ordinary diffusion (<var>A</var> &asymp; 1), and super-diffusion
+                        (<var>A</var> &gt; 1).
+                    </p>
+                </div>
+                <p>
+                    The model examples show that early-time spreading varies across initial conditions.
+                    They also motivate studying how changes in trapping probability relate to that behavior;
+                    the results shown here describe finite sequences of modeled interactions.
+                </p>
+
+                <figure class="research-figure">
+                    <a href="../materials/research/nyheim/diffusion-exponent-map.png" aria-label="Open the diffusion exponent map at full size">
+                        <img src="../materials/research/nyheim/diffusion-exponent-map.png"
+                             alt="Two maps of estimated spreading exponent across initial electron energy and pitch angle, with slower spreading at many lower pitch angles and faster spreading at higher pitch angles."
+                             width="1144" height="1304" loading="lazy" decoding="async">
+                    </a>
+                    <figcaption>
+                        <strong>Figure 1. Spreading depends on the initial conditions.</strong>
+                        Model estimates of the early-time exponent <var>A</var> for normalized wave frequencies
+                        0.2 (top) and 0.4 (bottom). The horizontal axis is energy in keV; the vertical axis is
+                        equatorial pitch angle in degrees. Colors distinguish slower and faster spreading relative to
+                        <var>A</var> = 1. From the project description, Figure 5.
+                        <a href="../materials/research/nyheim/diffusion-exponent-map.png">View full-size figure</a>.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <section aria-labelledby="data-heading">
+                <h2 id="data-heading">Analyzing satellite electron spectra</h2>
+                <p>
+                    A related observational strand used ELFIN satellite measurements of trapped and
+                    precipitating electrons. I built Python tools to align electron-flux measurements with
+                    spacecraft position, calculate precipitation-to-trapped-flux ratios, and compare energy spectra.
+                </p>
+                <p>
+                    I normalized spectra to the lowest-energy channel and fitted power-law models with an
+                    exponential cutoff. Medians, histograms, and density estimates helped compare groups with
+                    different precipitation characteristics. This work characterized the observations and
+                    provided a complementary perspective on electron transport.
+                </p>
+
+                <figure class="research-figure">
+                    <a href="../materials/research/nyheim/elfin-spectral-fits.png" aria-label="Open the ELFIN spectral fits at full size">
+                        <img src="../materials/research/nyheim/elfin-spectral-fits.png"
+                             alt="Six examples of normalized trapped-electron energy spectra. Blue observed points are compared with red fitted curves; the agreement varies between examples."
+                             width="771" height="1151" loading="lazy" decoding="async">
+                    </a>
+                    <figcaption>
+                        <strong>Figure 2. Fitting observed electron spectra.</strong>
+                        Examples from intervals with a precipitation-to-trapped-flux ratio <var>R</var> &lt; 0.1.
+                        Blue points show normalized measurements; red curves show power-law fits with an
+                        exponential cutoff. Energy is in keV. These examples illustrate the fitting procedure
+                        and variation in fit quality. The parameter <var>A</var> in this figure is a spectral
+                        amplitude, distinct from the spreading exponent in Figure 1.
+                        <a href="../materials/research/nyheim/elfin-spectral-fits.png">View full-size figure</a>.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <section aria-labelledby="related-heading">
+                <h2 id="related-heading">Related computational work</h2>
+                <p>
+                    I also studied a slowly varying Hamiltonian system by integrating trajectories,
+                    calculating adiabatic invariants, and comparing ensembles of initial conditions.
+                    These calculations examined how initial positions in phase space relate to later
+                    distributions of the action, a quantity used to describe orbital motion.
+                </p>
+            </section>
+        </article>
+    </main>
+</body>
+</html>
