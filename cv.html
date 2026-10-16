@@ -1,36 +1,98 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Curriculum Vitae</title>
+    <title>CV | Dominic Marchese</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="favicon.png">
 </head>
+<body class="cv-page">
+    <header class="site-header">
+        <a class="site-name" href="index.html">Dominic Marchese</a>
+        <nav aria-label="Primary navigation">
+            <a href="index.html">Home</a>
+            <a href="research.html">Research &amp; Projects</a>
+            <a href="cv.html" aria-current="page">CV</a>
+        </nav>
+    </header>
 
-<body>
+    <main>
+        <div class="page-heading">
+            <h1>Curriculum vitae</h1>
+            <div class="quick-links">
+                <a class="button" href="materials/cv.pdf" download target="_blank" rel="noopener">Download CV (PDF)</a>
+                <a class="button secondary" href="materials/courses.html">Highlighted Coursework</a>
+            </div>
+        </div>
 
-    <h1>Curriculum Vitae</h1>
+        <div class="cv-summary">
+            <section class="cv-section cv-current-role" aria-labelledby="current-role-heading">
+                <h2 id="current-role-heading">Current role</h2>
+                <h3>Research Analyst, Federal Reserve Bank of Atlanta</h3>
+                <p class="meta">2026&ndash;present</p>
+                <p>
+                    I assist with policy-relevant macroeconomic research working with Dr. Choongryul Yang,
+                    using statistical and computational analysis to study inflation expectations and
+                    monetary-policy transmission. I also contribute to the Career Ladder Identifier
+                    and Financial Forecaster (CLIFF) tools working with Dr. David Altig.
+                </p>
+            </section>
 
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="research.html">Research</a>
-        <a href="cliff.html">CLIFF</a>
-        <a href="cv.html">CV</a>
-    </nav>
-    <div class="quick-links">
-        <a class="button" href="materials/cv.pdf" target="_blank">
-            Download CV (PDF)
-        </a>
-        <a class="button secondary" href="courses.html">Highlighted Coursework</a>
-    </div>
-    <div class="pdf-container">
-        <iframe
-            src="materials/cv.pdf"
-            width="100%"
-            height="1000px">
-        </iframe>
-    </div>
+            <section class="cv-section" aria-labelledby="education-heading">
+                <h2 id="education-heading">Education</h2>
+                <div class="cv-entry">
+                    <h3>Drexel University</h3>
+                    <p>B.S. in Economics and Mathematics, 2026<br><em>Magna cum laude</em></p>
+                </div>
+                <div class="cv-entry">
+                    <h3>Laurel Ridge Community College</h3>
+                    <p>A.A.S. in Business Administration, 2023</p>
+                </div>
+                <!-- CV PDF revision: change the Laurel Ridge degree from A.S. to the user-confirmed A.A.S. in a separately authorized PDF revision. The existing PDF is unchanged. -->
+            </section>
 
+            <section class="cv-section" aria-labelledby="previous-research-heading">
+                <h2 id="previous-research-heading">Previous research experience</h2>
+                <div class="cv-entry">
+                    <h3>C. &amp; J. Nyheim Plasma Institute</h3>
+                    <p class="meta">Research Assistant, Drexel University &middot; 2025&ndash;2026</p>
+                    <p>
+                        Worked with Dr. Dmitri Vainchtein on energetic-electron transport in Earth's
+                        magnetosphere, developing Python workflows for ELFIN satellite data and
+                        test-particle simulations in Julia.
+                    </p>
+                </div>
+                <div class="cv-entry">
+                    <h3>Drexel University, School of Economics</h3>
+                    <p class="meta">Research Apprenticeship &middot; 2025&ndash;2026</p>
+                    <p>
+                        Worked with Dr. Christopher Laincz on computational endogenous-growth models
+                        that track firm age to study growth slowdowns and barriers to firm expansion.
+                    </p>
+                </div>
+            </section>
+
+            <section class="cv-section" aria-labelledby="skills-heading">
+                <h2 id="skills-heading">Selected technical skills</h2>
+                <p><strong>Tools:</strong> Python, R, Julia, Stata, SQL, and LaTeX.</p>
+                <p><strong>Methods:</strong> econometric analysis, statistical modeling, numerical simulation,
+                    computational modeling, and data visualization.</p>
+            </section>
+
+            <section class="cv-section" aria-labelledby="teaching-heading">
+                <h2 id="teaching-heading">Teaching experience</h2>
+                <h3>Economics Tutor, Drexel University</h3>
+                <p class="meta">2024&ndash;2025</p>
+                <p>Tutored students in introductory microeconomics and macroeconomics, adapting explanations to individual needs.</p>
+            </section>
+        </div>
+
+        <section class="pdf-container" aria-labelledby="full-cv-heading">
+            <h2 id="full-cv-heading">Full CV</h2>
+            <p><a href="materials/cv.pdf" target="_blank" rel="noopener">Open the CV PDF in a new tab</a> if the preview is unavailable.</p>
+            <iframe src="materials/cv.pdf" title="Dominic Marchese's curriculum vitae" width="100%" height="850" loading="lazy"></iframe>
+        </section>
+    </main>
 </body>
 </html>

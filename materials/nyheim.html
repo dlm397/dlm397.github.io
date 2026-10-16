@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Dominic Marchese's research at the Nyheim Plasma Institute: Julia simulations of nonlinear electron transport and Python analysis of ELFIN satellite observations.">
-    <title>Nyheim Plasma Research | Dominic Marchese</title>
+    <title>Nonlinear electron transport in the magnetosphere | Dominic Marchese</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="icon" type="image/png" href="../favicon.png">
 </head>
@@ -12,24 +12,23 @@
 <body class="research-page">
     <header class="site-header">
         <div class="name-block">
-            <p class="research-site-name">Dominic Marchese</p>
+            <a class="site-name" href="../index.html">Dominic Marchese</a>
         </div>
         <nav aria-label="Primary navigation">
             <a href="../index.html">Home</a>
-            <a href="../research.html" aria-current="true">Research</a>
-            <a href="../cliff.html">CLIFF</a>
+            <a href="../research.html" aria-current="true">Research &amp; Projects</a>
             <a href="../cv.html">CV</a>
         </nav>
     </header>
 
     <main class="research-article">
-        <a class="research-back-link" href="../research.html"><span aria-hidden="true">&larr;</span> All research</a>
+        <a class="research-back-link" href="../research.html"><span aria-hidden="true">&larr;</span> Research &amp; Projects</a>
 
         <article>
             <header class="research-article-header">
                 <p class="eyebrow">C. &amp; J. Nyheim Plasma Institute &middot; Drexel University</p>
-                <h1>Electron super- and sub-diffusion in velocity space due to nonlinear resonances with whistler-mode waves</h1>
-                <p class="research-subtitle"></p>
+                <h1>Nonlinear electron transport in the magnetosphere</h1>
+                <p class="research-subtitle">Electron super- and sub-diffusion in velocity space due to nonlinear resonances with whistler-mode waves</p>
                 <dl class="research-meta">
                     <div>
                         <dt>Role &amp; period</dt>
@@ -41,7 +40,7 @@
                     </div>
                     <div>
                         <dt>Tools</dt>
-                        <dd>Julia, Python, R, &amp; SQL</dd>
+                        <dd>Julia &amp; Python</dd>
                     </div>
                 </dl>
             </header>
@@ -58,7 +57,10 @@
                 <p>
                     As a research assistant in the Computational Physics Laboratory, I worked on numerical
                     models of these interactions and statistical analysis of satellite observations.
-                    The work brought together dynamical systems, stochastic simulation, and spectral fitting.
+                    My contributions included Julia simulations of repeated resonant interactions and a
+                    Python pipeline for processing ELFIN electron-flux measurements. These were complementary
+                    modeling and observational analyses; the examples below do not establish quantitative
+                    agreement between simulations and satellite data.
                 </p>
             </section>
 
@@ -84,24 +86,51 @@
                         their dependence on initial conditions and wave frequency.
                     </li>
                 </ul>
+                <p>
+                    To describe ensemble spreading, we define a normalized
+                    mean squared displacement from each particle's initial state:
+                </p>
                 <div class="research-equation">
+                    <div class="math-scroll">
+                        <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="M of n equals one over K times the sum from k equals one to K of the squared energy change divided by 350 squared, plus the squared pitch angle change divided by 60 squared.">
+                            <mrow>
+                                <mi>M</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo>
+                                <mfrac><mn>1</mn><mi>K</mi></mfrac>
+                                <munderover><mo>&#x2211;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover>
+                                <mo>[</mo>
+                                <msup><mrow><mo>(</mo><mfrac><mrow><mo>&#x394;</mo><msub><mi>E</mi><mrow><mi>n</mi><mo>,</mo><mi>k</mi></mrow></msub></mrow><mn>350</mn></mfrac><mo>)</mo></mrow><mn>2</mn></msup>
+                                <mo>+</mo>
+                                <msup><mrow><mo>(</mo><mfrac><mrow><mo>&#x394;</mo><msub><mi>&#x3B1;</mi><mrow><mi>n</mi><mo>,</mo><mi>k</mi></mrow></msub></mrow><mn>60</mn></mfrac><mo>)</mo></mrow><mn>2</mn></msup>
+                                <mo>]</mo>
+                            </mrow>
+                        </math>
+                    </div>
+                    <p>
+                        <var>K</var> is the number of trajectories and <var>n</var> counts resonant interactions.
+                        &Delta;<var>E</var><sub>n,k</sub> = <var>E</var><sub>n,k</sub> &minus; <var>E</var><sub>0,k</sub>
+                        is particle <var>k</var>'s energy change in keV;
+                        &Delta;<var>&alpha;</var><sub>n,k</sub> = <var>&alpha;</var><sub>n,k</sub> &minus; <var>&alpha;</var><sub>0,k</sub>
+                        is its equatorial pitch-angle change in degrees. The scales are 350 keV and 60&deg;,
+                        so <var>M</var> is dimensionless. It measures displacement from initial states,
+                        rather than variance about the ensemble's evolving mean.
+                    </p>
                     <p class="formula"><var>M</var>(<var>n</var>) &prop; <var>n</var><sup><var>A</var></sup></p>
                     <p>
-                        Here, <var>M</var> measures ensemble spreading and <var>n</var> counts resonant
-                        interactions. The exponent <var>A</var> distinguishes sub-diffusion
-                        (<var>A</var> &lt; 1), ordinary diffusion (<var>A</var> &asymp; 1), and super-diffusion
-                        (<var>A</var> &gt; 1).
+                        A slope <var>A</var> on logarithmic axes describes slower-than-linear
+                        (<var>A</var> &lt; 1), approximately linear (<var>A</var> &asymp; 1), or faster-than-linear
+                        (<var>A</var> &gt; 1) growth over the selected interactions.
                     </p>
                 </div>
                 <p>
-                    The model examples show that early-time spreading varies across initial conditions.
-                    They also motivate studying how changes in trapping probability relate to that behavior;
-                    the results shown here describe finite sequences of modeled interactions.
+                    The model examples show that early spreading varies with initial energy and pitch angle.
+                    These results concern <strong>finite sequences of modeled interactions</strong>;
+                    they do not establish asymptotic sub- or super-diffusion. The relationship between
+                    changes in trapping probability and spreading was an investigated explanation,
+                    rather than an established general result.
                 </p>
-
                 <figure class="research-figure">
-                    <a href="../materials/research/nyheim/diffusion-exponent-map.png" aria-label="Open the diffusion exponent map at full size">
-                        <img src="../materials/research/nyheim/diffusion-exponent-map.png"
+                    <a href="nyheim/diffusion-exponent-map.png" aria-label="Open the diffusion exponent map at full size" target="_blank" rel="noopener">
+                        <img src="nyheim/diffusion-exponent-map.png"
                              alt="Two maps of estimated spreading exponent across initial electron energy and pitch angle, with slower spreading at many lower pitch angles and faster spreading at higher pitch angles."
                              width="1144" height="1304" loading="lazy" decoding="async">
                     </a>
@@ -111,7 +140,7 @@
                         0.2 (top) and 0.4 (bottom). The horizontal axis is energy in keV; the vertical axis is
                         equatorial pitch angle in degrees. Colors distinguish slower and faster spreading relative to
                         <var>A</var> = 1. 
-                        <a href="../materials/research/nyheim/diffusion-exponent-map.png">View full-size figure</a>.
+                        <a href="nyheim/diffusion-exponent-map.png" target="_blank" rel="noopener">View full-size figure</a>.
                     </figcaption>
                 </figure>
             </section>
@@ -119,7 +148,7 @@
             <section aria-labelledby="data-heading">
                 <h2 id="data-heading">Analyzing satellite electron spectra</h2>
                 <p>
-                    A related observational strand used ELFIN satellite measurements of trapped and
+                    A separate observational strand used ELFIN satellite measurements of trapped and
                     precipitating electrons. I built Python tools to align electron-flux measurements with
                     spacecraft position, calculate precipitation-to-trapped-flux ratios, and compare energy spectra.
                 </p>
@@ -131,31 +160,34 @@
                 </p>
 
                 <figure class="research-figure">
-                    <a href="../materials/research/nyheim/elfin-spectral-fits.png" aria-label="Open the ELFIN spectral fits at full size">
-                        <img src="../materials/research/nyheim/elfin-spectral-fits.png"
+                    <a href="nyheim/elfin-spectral-fits.png" aria-label="Open the ELFIN spectral fits at full size" target="_blank" rel="noopener">
+                        <img src="nyheim/elfin-spectral-fits.png"
                              alt="Six examples of normalized trapped-electron energy spectra. Blue observed points are compared with red fitted curves; the agreement varies between examples."
                              width="771" height="1151" loading="lazy" decoding="async">
                     </a>
                     <figcaption>
                         <strong>Figure 2. Fitting observed electron spectra.</strong>
-                        Examples from intervals with a precipitation-to-trapped-flux ratio <var>R</var> &lt; 0.1.
+                        Examples selected using a precipitation-to-trapped-flux ratio <var>R</var> &lt; 0.1
+                        in the lowest-energy channel.
                         Blue points show normalized measurements; red curves show power-law fits with an
                         exponential cutoff. Energy is in keV. These examples illustrate the fitting procedure
                         and variation in fit quality. The parameter <var>A</var> in this figure is a spectral
                         amplitude, distinct from the spreading exponent in Figure 1.
-                        <a href="../materials/research/nyheim/elfin-spectral-fits.png">View full-size figure</a>.
+                        <a href="nyheim/elfin-spectral-fits.png" target="_blank" rel="noopener">View full-size figure</a>.
                     </figcaption>
                 </figure>
             </section>
 
             <section aria-labelledby="related-heading">
-                <h2 id="related-heading">Related computational work</h2>
+                <h2 id="related-heading">A Hamiltonian perspective</h2>
                 <p>
                     I also studied a slowly varying Hamiltonian system by integrating trajectories,
                     calculating adiabatic invariants, and comparing ensembles of initial conditions.
                     These calculations examined how initial positions in phase space relate to later
-                    distributions of the action and were going to be used in a companion paper, but 
-                    lacked significant application, so they were scrapped.
+                    distributions of the action, an integral describing motion along an orbit.
+                    They provided a different perspective on the behavior already being studied.
+                    The results did not establish a distinct conclusion, so this strand was not
+                    developed further.
                 </p>
             </section>
         </article>

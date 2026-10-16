@@ -4,28 +4,61 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="An interactive, browser-based visualization of the Metropolis-Hastings algorithm sampling a bimodal target distribution.">
-  <title>Metropolis-Hastings Algorithm</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Interactive Metropolis–Hastings Explorer | Dominic Marchese</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .mh-explorer .mh-intro-row h1 {
+      margin: 0 0 0.65rem;
+      font-size: clamp(1.65rem, 3vw, 2.15rem);
+    }
+    .mh-explorer .control-panel,
+    .mh-explorer .visual-panel,
+    .mh-explorer .status-pill { box-shadow: none; }
+    .mh-explorer .control-panel,
+    .mh-explorer .visual-panel,
+    .mh-explorer .plot-card,
+    .mh-explorer .stat-grid,
+    .mh-explorer .explanation { border-radius: 4px; }
+    .mh-explorer .trace-card { margin-top: 1rem; }
+    .mh-explorer #traceCanvas { height: 180px; aspect-ratio: auto; }
+    .mh-explorer .trace-caption {
+      margin: 0;
+      padding: 0.6rem 1rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    .mh-explorer .mixing-note {
+      margin: 0.9rem 0.15rem 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    @media (max-width: 480px) {
+      .mh-explorer .visual-panel { padding: 0.65rem; }
+      .mh-explorer .plot-title { flex-wrap: wrap; gap: 0.4rem; }
+    }
+  </style>
 </head>
 <body class="mh-page">
   <header class="site-header">
     <div class="name-block">
-      <h1>Metropolis&ndash;Hastings Algorithm</h1>
+      <a class="site-name" href="../index.html">Dominic Marchese</a>
     </div>
 
     <nav aria-label="Primary navigation">
-      <a href="index.html">Home</a>
-      <a href="research.html">Research</a>
-      <a href="cliff.html">CLIFF</a>
-      <a href="cv.html">CV</a>
+      <a href="../index.html">Home</a>
+      <a href="../research.html" aria-current="true">Research &amp; Projects</a>
+      <a href="../cv.html">CV</a>
     </nav>
   </header>
 
   <main class="mh-explorer">
     <section class="mh-intro-row" aria-labelledby="explorer-introduction">
       <div>
+        <h1 id="explorer-introduction">Interactive Metropolis&ndash;Hastings Explorer</h1>
         <p class="section-note">
-          An implementation of the <a href="https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm" target="_blank">Metropolis-Hastings algorithm</a> as a homework assignment. Shape a two-mode target distribution, then watch a random-walk sampler decide which proposals become part of its chain.
+          Originally developed for a homework assignment, this demonstration lets you watch a random-walk sampler explore a two-mode distribution. Adjust the proposal size to see how it changes the sampler&rsquo;s movement and acceptance decisions.
         </p>
       </div>
       <div class="status-pill" id="runStatus" data-running="true" role="status" aria-live="polite">
@@ -41,7 +74,7 @@
         </div>
 
         <fieldset>
-          <legend>Unknown target</legend>
+          <legend>Target distribution</legend>
 
           <div class="range-control">
             <label class="range-label" for="separation">
@@ -170,12 +203,28 @@
           <span class="legend-item"><span class="legend-mark retained"></span>Retained density</span>
         </div>
 
+        <article class="plot-card trace-card">
+          <div class="plot-title">
+            <div>
+              <h2>Coordinate trace</h2>
+              <p>The x coordinate over the most recent 400 chain states</p>
+            </div>
+          </div>
+          <canvas id="traceCanvas" role="img" aria-label="Trace of the chain's x coordinate against chain step, including repeated states after rejections" aria-describedby="trace-description traceSummary">The coordinate trace plots each chain state against its step number.</canvas>
+          <p class="trace-caption" id="trace-description">Flat stretches show repeated states; longer stays near one mode show slow exploration. Dashed lines mark the two component centers. Burn-in states are included in this trace.</p>
+          <p class="trace-caption" id="traceSummary"></p>
+        </article>
+
         <div class="explanation">
           <span class="equation">α = min(1, p(new) / p(current))</span>
           <span>
             A symmetric Gaussian proposal makes its forward and reverse terms cancel. A rejection is still a valid Markov-chain sample: the chain stays at its current position, so repeated states are included in the empirical density.
           </span>
         </div>
+        <p class="mixing-note">
+          When modes are separated by a low-density region, the chain can spend many steps near one mode before reaching the other: this is poor mixing. Small proposals may be accepted often but move slowly; very large proposals may be rejected often. Try increasing mode separation and changing proposal size, then watch the trace. Acceptance rate alone does not establish convergence, and a short trace can miss problems that appear over a longer run.
+        </p>
+        <p class="trace-caption">The two-dimensional plots show the window from &minus;5 to 5 on each axis; the sampler itself is not restricted to that window.</p>
 
         <p class="sr-only" id="liveDecision" aria-live="polite"></p>
       </section>
@@ -189,6 +238,7 @@
       const DOMAIN = Object.freeze({ min: -5, max: 5 });
       const MAX_STORED_STATES = 7000;
       const MAX_DRAWN_STATES = 1800;
+      const MAX_TRACE_STATES = 400;
       const DENSITY_GRID_SIZE = 64;
       const TARGET_GRID_WIDTH = 180;
       const TARGET_GRID_HEIGHT = 150;
@@ -229,7 +279,9 @@
         targetTag: document.querySelector("#targetTag"),
         liveDecision: document.querySelector("#liveDecision"),
         trajectoryCanvas: document.querySelector("#trajectoryCanvas"),
-        densityCanvas: document.querySelector("#densityCanvas")
+        densityCanvas: document.querySelector("#densityCanvas"),
+        traceCanvas: document.querySelector("#traceCanvas"),
+        traceSummary: document.querySelector("#traceSummary")
       };
 
       const state = {
@@ -329,6 +381,8 @@
         state.densityMaximum = 0;
         state.densityDirty = true;
         state.stepAccumulator = 0;
+        state.lastAnnouncementStep = 0;
+        elements.liveDecision.textContent = "Chain reset.";
         state.lastFrameTime = performance.now();
         updateStats();
         drawAll();
@@ -425,8 +479,8 @@
       function canvasMetrics(canvas) {
         const rect = canvas.getBoundingClientRect();
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const width = Math.max(280, rect.width);
-        const height = Math.max(250, rect.height);
+        const width = Math.max(1, rect.width);
+        const height = Math.max(1, rect.height);
         const pixelWidth = Math.round(width * dpr);
         const pixelHeight = Math.round(height * dpr);
 
@@ -853,9 +907,81 @@
         context.restore();
       }
 
+      function drawCoordinateTrace() {
+        const { context, width, height } = canvasMetrics(elements.traceCanvas);
+        const samples = state.states.slice(-MAX_TRACE_STATES);
+        const firstStep = samples[0].step;
+        const lastStep = samples[samples.length - 1].step;
+        const stepRange = Math.max(1, lastStep - firstStep);
+        const limit = Math.max(5, ...samples.map((sample) => Math.ceil(Math.abs(sample.x))));
+        const area = { left: 42, right: width - 18, top: 18, bottom: height - 37 };
+        const xPixel = (step) => area.left + ((step - firstStep) / stepRange) * (area.right - area.left);
+        const yPixel = (value) => area.top + ((limit - value) / (2 * limit)) * (area.bottom - area.top);
+
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = "#f7f9fa";
+        context.fillRect(0, 0, width, height);
+        context.save();
+        context.font = "11px ui-sans-serif, system-ui, sans-serif";
+        context.fillStyle = "#4d5863";
+        context.textAlign = "right";
+        context.textBaseline = "middle";
+        for (const value of [-limit, 0, limit]) {
+          const y = yPixel(value);
+          context.strokeStyle = "rgba(10, 61, 98, 0.12)";
+          context.beginPath();
+          context.moveTo(area.left, y);
+          context.lineTo(area.right, y);
+          context.stroke();
+          context.fillText(String(value), area.left - 9, y);
+        }
+
+        context.strokeStyle = "rgba(46, 111, 95, 0.55)";
+        context.setLineDash([5, 4]);
+        for (const center of [-state.settings.separation / 2, state.settings.separation / 2]) {
+          context.beginPath();
+          context.moveTo(area.left, yPixel(center));
+          context.lineTo(area.right, yPixel(center));
+          context.stroke();
+        }
+        context.setLineDash([]);
+        context.strokeStyle = "#0a3d62";
+        context.lineWidth = 1.3;
+        context.beginPath();
+        samples.forEach((sample, index) => {
+          const x = xPixel(sample.step);
+          const y = yPixel(sample.x);
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.stroke();
+        if (samples.length === 1) {
+          context.fillStyle = "#0a3d62";
+          context.beginPath();
+          context.arc(xPixel(firstStep), yPixel(samples[0].x), 2, 0, Math.PI * 2);
+          context.fill();
+        }
+
+        context.fillStyle = "#4d5863";
+        context.textBaseline = "top";
+        context.textAlign = "left";
+        context.fillText(firstStep.toLocaleString(), area.left, area.bottom + 8);
+        if (lastStep > firstStep) {
+          context.textAlign = "right";
+          context.fillText(lastStep.toLocaleString(), area.right, area.bottom + 8);
+        }
+        context.textAlign = "center";
+        context.fillText("Chain step", (area.left + area.right) / 2, area.bottom + 8);
+        context.textAlign = "left";
+        context.fillText("x", 12, 3);
+        context.restore();
+        elements.traceSummary.textContent = `Steps ${firstStep.toLocaleString()}–${lastStep.toLocaleString()}; current x = ${state.current.x.toFixed(2)}.`;
+      }
+
       function drawAll() {
         drawTrajectory();
         drawDensity();
+        drawCoordinateTrace();
         updateStats();
         state.layoutDirty = false;
       }
@@ -931,6 +1057,7 @@
       });
       resizeObserver.observe(elements.trajectoryCanvas);
       resizeObserver.observe(elements.densityCanvas);
+      resizeObserver.observe(elements.traceCanvas);
 
       syncControlOutputs();
       setRunning(state.running);

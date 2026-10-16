@@ -3,29 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Research by Dominic Marchese in computational modeling and statistical analysis, including electron transport at Drexel University's Nyheim Plasma Institute.">
-    <title>Research | Dominic Marchese</title>
+    <meta name="description" content="Research and projects by Dominic Marchese: plasma transport, airline ownership and productivity, macroeconomic research, CLIFF, and probabilistic forecasting.">
+    <title>Research &amp; Projects | Dominic Marchese</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="favicon.png">
 </head>
-
 <body class="research-page">
     <header class="site-header">
-        <div class="name-block">
-            <h1>Research</h1>
-        </div>
+        <a class="site-name" href="index.html">Dominic Marchese</a>
         <nav aria-label="Primary navigation">
             <a href="index.html">Home</a>
-            <a href="research.html" aria-current="page">Research</a>
-            <a href="cliff.html">CLIFF</a>
+            <a href="research.html" aria-current="page">Research &amp; Projects</a>
             <a href="cv.html">CV</a>
         </nav>
     </header>
-
-    <main>
-        <article class="research-project" aria-labelledby="nyheim-heading">
-            <h2 id="nyheim-heading">Electron super- and sub-diffusion in velocity space due to nonlinear resonances with whistler-mode waves</h2>
-            <a class="research-project-link" href="research/nyheim.html">Project details &amp; figures <span aria-hidden="true">&rarr;</span></a>
+    <main class="project-list">
+        <h1 class="page-heading">Research &amp; Projects</h1>
+        <article class="research-project" id="macroeconomics" aria-labelledby="macro-heading">
+            <p class="eyebrow">Current research assistance &middot; Federal Reserve Bank of Atlanta</p>
+            <h2 id="macro-heading">Macroeconomic Research with Dr. Choongryul Yang</h2>
+            <p>I assist Dr. Choongryul Yang with policy-relevant macroeconomic research, contributing computational analysis of economic data and targeted literatue review to support model development and empirical motivations. My work supports research on inflation expectations, information-transmission frictions and the heterogeneity of the effects of monetary policy.</p>
+            <a class="research-project-link">Research is Forthcoming</a>
+        </article>
+        <article class="research-project" id="cliff" aria-labelledby="cliff-heading">
+            <p class="eyebrow">Current research and implementation &middot; Federal Reserve Bank of Atlanta</p>
+            <h2 id="cliff-heading">CLIFF: benefits cliffs and career advancement</h2>
+            <p>The Career Ladder Identifier and Financial Forecaster (CLIFF) tools examine how benefits, taxes, earnings, and household expenses interact during career advancement, including situations where higher earnings trigger a loss of benefits. Working with Dr. David Altig, I help improve the experience of using and working with the tools, including the presentation of information and the workflows around it. Clearer presentation and more usable workflows are intended to support wider adoption and use of these research-informed tools.</p>
+            <a class="research-project-link" href="https://www.atlantafed.org/research-and-data/data/cliff-tool" target="_blank" rel="noopener">Official Atlanta Fed CLIFF resource</a>
+            <!-- CLIFF: verified_implementation_details: "". Add specific visualization, data-organization, or workflow changes only when documented. -->
+        </article>
+        <article class="research-project" id="plasma" aria-labelledby="plasma-heading">
+            <p class="eyebrow">Research assistant &middot; Nyheim Plasma Institute &middot; 2025&ndash;2026</p>
+            <h2 id="plasma-heading">Nonlinear electron transport in the magnetosphere</h2>
+            <p>How do repeated interactions with whistler-mode waves spread electron energies and pitch angles? Working with Dr. Dmitri Vainchtein, I developed Julia simulations of resonant interactions and examined spreading across particle ensembles. In a separate observational strand, I built Python tools to organize and analyze ELFIN satellite electron spectra. The project page explains the methods and shows figures from the modeled interactions and spectral analysis.</p>
+            <a class="research-project-link" href="materials/nyheim.html">Electron transport: Models, Satellite analysis, and Figures</a>
+        </article>
+        <article class="research-project" id="airline" aria-labelledby="airline-heading">
+            <p class="eyebrow">Course research project &middot; Drexel University &middot; 2025</p>
+            <h2 id="airline-heading">Common ownership and estimated airline productivity</h2>
+            <p>This course research project examined the relationship between institutional investors' ownership of competing airlines and estimated airline productivity. I combined airline operational and financial data with institutional ownership data, estimated productivity, and used panel-data analysis to examine associations. The workflow drew on Department of Transportation Form 41 data and SEC Form 13F filings.</p>
+            <a class="research-project-link" href="materials/airline.html">Airline productivity: Overview, Paper, and Presentation</a>
+        </article>
+        <article class="research-project" id="deadlock" aria-labelledby="deadlock-heading">
+            <p class="eyebrow">Independent exploration</p>
+            <h2 id="deadlock-heading">Probabilistic forecasting with Deadlock match data</h2>
+            <p>The game Deadlock provides open-access to detailed match level data. This provides a setting for exploration of statistical methods for highly dependent time-series data. Of particular interest is probabilistic forecasting and uncertainty evaluation: estimation of outcome distributions, accounting for dependence over time, and assessing forecast uncertainty.</p>
+            <a class="research-project-link">Results are Forthcoming</a>
         </article>
     </main>
 </body>
