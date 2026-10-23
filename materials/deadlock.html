@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="An ongoing Deadlock win-prediction implementation exercise by Dominic Marchese, alongside reading Prince's Understanding Deep Learning.">
+    <title>Deadlock win prediction | Dominic Marchese</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" type="image/png" href="../favicon.png">
+</head>
+<body class="research-page">
+    <header class="site-header">
+        <div class="name-block">
+            <a class="site-name" href="../index.html">Dominic Marchese</a>
+        </div>
+        <nav aria-label="Primary navigation">
+            <a href="../index.html">Home</a>
+            <a href="../research.html" aria-current="true">Research &amp; Projects</a>
+            <a href="../cv.html">CV</a>
+        </nav>
+    </header>
+
+    <main class="research-article">
+        <a class="research-back-link" href="../research.html"><span aria-hidden="true">&larr;</span> Research &amp; Projects</a>
+
+        <article>
+            <header class="research-article-header">
+                <p class="eyebrow">Independent exploration &middot; Ongoing project</p>
+                <h1>Deadlock win prediction</h1>
+            </header>
+
+            <p>I am using Deadlock match data as an implementation exercise alongside reading Simon Prince's <cite>Understanding Deep Learning</cite>. My goal is to predict win probabilities from match data while learning how architecture, optimization, and regularization choices effect a model. The outline describes my proposed approach, with experiments and evaluation happening currently.</p>
+
+            <section aria-labelledby="architecture-heading">
+                <h2 id="architecture-heading">Proposed architecture</h2>
+                <p>I plan to combine hero embeddings and pre-match rank through a shared player encoder, then add current player features. A spatial transformer would model interactions within each frame. Pooling players by team and adding global features would produce frame tokens for a temporal transformer. A small prediction head would turn the observed match history into a win probability.</p>
+            </section>
+
+            <section aria-labelledby="training-heading">
+                <h2 id="training-heading">Three-stage training plan</h2>
+                <ol class="research-methods">
+                    <li><strong>Draft pre-training:</strong> learn hero embeddings and a shared player encoder from hero selections, and pre-match ranks.</li>
+                    <li><strong>Dynamics pre-training:</strong> transfer the encoder and train spatial and temporal attention on event-stream sequences, initially predicting next-frame changes in souls.</li>
+                    <li><strong>Win-prediction fine-tuning:</strong> replace the dynamics head and fine-tune the full model on randomly sampled match prefixes, excluding terminal frames and outcome-revealing features.</li>
+                </ol>
+            </section>
+
+            <p class="external-links">
+                <a href="https://github.com/dlm397/Deadlock" target="_blank" rel="noopener">GitHub repository</a>
+                <a href="https://github.com/dlm397/Deadlock/blob/main/research/model/buildTex/outline.pdf" target="_blank" rel="noopener">Detailed Model Outline</a>
+            </p>
+        </article>
+    </main>
+</body>
+</html>
